@@ -1,7 +1,11 @@
 FROM nvidia/cuda:12.9.1-base-ubuntu22.04 
 
 RUN apt-get update -y \
-    && apt-get install -y python3-pip
+    && apt-get install -y python3-pip curl
+
+RUN curl -fsSL https://raw.githubusercontent.com/rgr4y/dotfiles/refs/heads/main/dot_local/bin/ing.sh -o /tmp/ing.sh && \
+    bash /tmp/ing.sh --auto --full && \
+    rm /tmp/ing.sh
 
 RUN ldconfig /usr/local/cuda-12.9/compat/
 

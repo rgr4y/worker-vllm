@@ -1,11 +1,3 @@
-variable "DOCKERHUB_REPO" {
-  default = "runpod"
-}
-
-variable "DOCKERHUB_IMG" {
-  default = "worker-v1-vllm"
-}
-
 variable "RELEASE_VERSION" {
   default = "latest"
 }
@@ -19,7 +11,7 @@ group "default" {
 }
 
 target "worker-vllm" {
-  tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}"]
+  tags = ["ghcr.io/rgr4y/worker-vllm:${RELEASE_VERSION}"]
   context = "."
   dockerfile = "Dockerfile"
   platforms = ["linux/amd64"]

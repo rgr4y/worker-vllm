@@ -1,7 +1,8 @@
 FROM nvidia/cuda:12.9.1-base-ubuntu22.04 
 
 RUN apt-get update -y \
-    && apt-get install -y python3-pip curl
+    && apt-get install -y --no-install-recommends python3-pip curl \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://raw.githubusercontent.com/rgr4y/dotfiles/refs/heads/main/dot_local/bin/ing.sh -o /tmp/ing.sh && \
     bash /tmp/ing.sh --auto --full && \
@@ -12,8 +13,6 @@ RUN ldconfig /usr/local/cuda-12.9/compat/
 # Install vLLM with FlashInfer
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install "vllm[flashinfer]==0.19.0" --extra-index-url https://download.pytorch.org/whl/cu129
-
-
 
 # Install additional Python dependencies (after vLLM to avoid PyTorch version conflicts)
 COPY builder/requirements.txt /requirements.txt

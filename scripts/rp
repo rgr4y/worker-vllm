@@ -67,7 +67,8 @@ cmd_health() {
 }
 
 cmd_purge() {
-  _curl -X POST "${BASE}/purge"
+  _curl -X POST "${BASE}/purge-queue"
+  echo ""
   echo "Queue purged"
 }
 

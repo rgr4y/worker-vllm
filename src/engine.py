@@ -248,8 +248,8 @@ class OpenAIvLLMEngine(vLLMEngine):
         if self.tokenizer and hasattr(self.tokenizer, 'tokenizer'):
             chat_template = self.tokenizer.tokenizer.chat_template
         
-        self.chat_engine = OpenAIServingChat(
-            engine_client=self.llm, 
+        chat_kwargs = dict(
+            engine_client=self.llm,
             models=self.serving_models,
             response_role=self.response_role,
             request_logger=None,
@@ -266,7 +266,12 @@ class OpenAIvLLMEngine(vLLMEngine):
             enable_log_outputs=os.getenv('ENABLE_LOG_OUTPUTS', 'false').lower() == 'true',
             log_error_stack=os.getenv('LOG_ERROR_STACK', 'false').lower() == 'true',
         )
-        self.completion_engine = OpenAIServingCompletion(
+        import inspect
+        valid_params = inspect.signature(OpenAIServingChat.__init__).parameters
+        chat_kwargs = {k: v for k, v in chat_kwargs.items() if k in valid_params}
+        self.chat_engine = OpenAIServingChat(**chat_kwargs)
+
+        completion_kwargs = dict(
             engine_client=self.llm,
             models=self.serving_models,
             request_logger=None,
@@ -275,6 +280,9 @@ class OpenAIvLLMEngine(vLLMEngine):
             enable_force_include_usage=os.getenv('ENABLE_FORCE_INCLUDE_USAGE', 'false').lower() == 'true',
             log_error_stack=os.getenv('LOG_ERROR_STACK', 'false').lower() == 'true',
         )
+        valid_params = inspect.signature(OpenAIServingCompletion.__init__).parameters
+        completion_kwargs = {k: v for k, v in completion_kwargs.items() if k in valid_params}
+        self.completion_engine = OpenAIServingCompletion(**completion_kwargs)
 
         if hasattr(self.chat_engine, 'warmup'):
             await self.chat_engine.warmup()

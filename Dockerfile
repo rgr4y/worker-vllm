@@ -1,7 +1,9 @@
 FROM runpod/worker-v1-vllm:v2.11.3
 
 # Upgrade vLLM for Gemma 4 support
-RUN python3 -m pip install --no-cache-dir "vllm[flashinfer]==0.19.0" --extra-index-url https://download.pytorch.org/whl/cu129
+RUN python3 -m pip install --no-cache-dir \
+    "vllm[flashinfer]==0.19.0" --extra-index-url https://download.pytorch.org/whl/cu129 && \
+    python3 -m pip install --no-cache-dir "transformers>=4.57.0"
 
 # Dotfiles
 RUN apt-get update -y \

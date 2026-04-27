@@ -1,7 +1,8 @@
-
+scripts/deploy
 runpod.toml
 *.pyc
 .env
 test/*
 vllm-base/vllm-*
 .DS_Store
+*.tgz

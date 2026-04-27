@@ -11,7 +11,7 @@ group "default" {
 }
 
 target "worker-vllm" {
-  tags = ["ghcr.io/rgr4y/worker-vllm:${RELEASE_VERSION}"]
+  tags = ["dx4100/worker-vllm:${RELEASE_VERSION}"]
   context = "."
   dockerfile = "Dockerfile"
   platforms = ["linux/amd64"]

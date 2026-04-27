@@ -6,9 +6,7 @@ RUN python3 -m pip install --no-cache-dir \
 RUN python3 -c "import transformers; print(f'transformers={transformers.__version__}')"
 
 # Override defaults for Gemma 4 31B AWQ
-ENV MODEL_NAME="QuantTrio/gemma-4-31B-it-AWQ" \
-    QUANTIZATION="awq" \
-    HF_HUB_ENABLE_HF_TRANSFER=1
+ENV HF_HUB_ENABLE_HF_TRANSFER=1
 
 COPY src /src
 

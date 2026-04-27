@@ -1,4 +1,4 @@
-FROM runpod/worker-v1-vllm:v2.11.3
+FROM runpod/worker-v1-vllm:v2.14.0
 
 # Upgrade vLLM for Gemma 4 support
 RUN python3 -m pip install --no-cache-dir \

@@ -8,6 +8,9 @@ RUN python3 -c "import transformers; print(f'transformers={transformers.__versio
 # Override defaults for Gemma 4 31B AWQ
 ENV HF_HUB_ENABLE_HF_TRANSFER=1
 
+RUN apt-get update && apt-get --no-install-recommends -y install curl zsh \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY src /src
 
-CMD ["python3", "/src/handler.py"]
+CMD ["/src/start.sh"]

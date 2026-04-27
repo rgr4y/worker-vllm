@@ -12,5 +12,6 @@ RUN apt-get update && apt-get --no-install-recommends -y install curl zsh \
     && rm -rf /var/lib/apt/lists/*
 
 COPY src /src
+RUN chmod +x /src/start.sh
 
 CMD ["/src/start.sh"]

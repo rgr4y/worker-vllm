@@ -66,7 +66,6 @@ def _resolve_field_type(field_type: type) -> type:
     origin = get_origin(field_type)
     args = get_args(field_type) if hasattr(field_type, "__args__") else ()
     if origin is not None:
-        # Optional[X] is Union[X, None]; X | None is UnionType
         non_none = [a for a in args if a is not type(None)]
         if non_none:
             return non_none[0]
@@ -82,6 +81,14 @@ def _convert_env_value_to_field_type(value: str, field_name: str, field_type: ty
             return None
         raise ValueError("empty value not allowed for non-optional field")
     effective_type = _resolve_field_type(field_type)
+    # bool|str unions: only convert to bool if value looks boolean, else keep as str
+    all_types = [a for a in (get_args(field_type) if hasattr(field_type, "__args__") else ()) if a is not type(None)]
+    if effective_type is bool and str in all_types:
+        if str(val).lower() in ("true", "1", "yes", "on"):
+            return True
+        if str(val).lower() in ("false", "0", "no", "off"):
+            return False
+        return str(val)
     # bool
     if effective_type is bool:
         return str(val).lower() in ("true", "1", "yes", "on")

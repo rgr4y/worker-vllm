@@ -8,6 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 : "${RUNPOD_ENDPOINT:?Set RUNPOD_ENDPOINT in .env or environment}"
 
 BASE="https://api.runpod.ai/v2/${RUNPOD_ENDPOINT}"
+MODEL="quanttrio/gemma-4-31b-it-awq"
 
 _curl() {
   curl -sS -H "Authorization: Bearer ${RUNPOD_API_KEY}" -H "Content-Type: application/json" "$@"
@@ -28,16 +29,26 @@ cmd_runsync() {
 cmd_chat() {
   local msg="$*"
   [[ -z "$msg" ]] && { echo "Usage: rp chat <message>" >&2; exit 1; }
-  _curl -X POST "${BASE}/runsync" -d "$(jq -n --arg m "$msg" '{
+  local resp
+  resp=$(_curl -X POST "${BASE}/runsync" -d "$(jq -n --arg mo "$MODEL" --arg m "$msg" '{
     input: {
       openai_route: "/v1/chat/completions",
       openai_input: {
-        model: "default",
+        model: $mo,
         messages: [{role:"user", content:$m}],
         max_tokens: 1024
       }
     }
-  }')" | jq -r '.output.choices[0].message.content // .output // .'
+  }')")
+  local content exec_ms tokens tps
+  content=$(echo "$resp" | jq -r 'if .output | type == "array" then .output[-1].choices[0].message.content elif .output.choices then .output.choices[0].message.content else .output // . end')
+  exec_ms=$(echo "$resp" | jq -r '.executionTime // 0')
+  tokens=$(echo "$resp" | jq -r 'if .output | type == "array" then .output[-1].usage.completion_tokens elif .output.usage then .output.usage.completion_tokens else 0 end // 0')
+  echo "$content"
+  if [[ "$tokens" -gt 0 && "$exec_ms" -gt 0 ]]; then
+    tps=$(echo "scale=1; $tokens / ($exec_ms / 1000)" | bc)
+    printf '\033[2m%s tokens in %sms • %s tok/s\033[0m\n' "$tokens" "$exec_ms" "$tps"
+  fi
 }
 
 cmd_status() {
